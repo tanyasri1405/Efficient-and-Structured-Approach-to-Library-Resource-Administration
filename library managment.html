@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Advanced Library Resource Administration System">
+    <title>Library Resource Admin | Modern LMS</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary: #ec4899;
+            --bg-dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --error: #f43f5e;
+            --success: #10b981;
+            --warning: #fbbf24;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.15) 0%, transparent 50%);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            max-width: 1200px;
+            margin: 1rem auto;
+            padding: 0 1rem;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 0.75rem;
+            color: white;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary { 
+            background: var(--primary); 
+            color: white; 
+        }
+        .btn-primary:hover { 
+            background: var(--primary-hover); 
+            transform: translateY(-1px); 
+        }
+        
+        .btn-secondary { 
+            background: transparent; 
+            border: 1px solid var(--glass-border); 
+            color: var(--text-main); 
+        }
+        .btn-secondary:hover { 
+            background: var(--glass-border); 
+        }
+
+        .btn-ghost { 
+            background: none; 
+            color: var(--primary); 
+            text-decoration: underline; 
+            padding: 0.25rem; 
+            cursor: pointer; 
+            border: none; 
+            font-size: 0.85rem; 
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid var(--glass-border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, 0.1);
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 1.25rem;
+            text-align: left;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        th { 
+            background: rgba(255, 255, 255, 0.05); 
+            color: var(--text-dim); 
+            font-weight: 500; 
+            text-transform: uppercase; 
+            font-size: 0.75rem; 
+            letter-spacing: 0.05em; 
+        }
+
+        tr:hover td { 
+            background: rgba(255, 255, 255, 0.02); 
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-available { 
+            background: rgba(16, 185, 129, 0.1); 
+            color: var(--success); 
+            border: 1px solid rgba(16, 185, 129, 0.3); 
+        }
+        .badge-out { 
+            background: rgba(244, 63, 94, 0.1); 
+            color: var(--error); 
+            border: 1px solid rgba(244, 63, 94, 0.3); 
+        }
+        .badge-borrowed { 
+            background: rgba(99, 102, 241, 0.1); 
+            color: var(--primary); 
+            border: 1px solid rgba(99, 102, 241, 0.3); 
+        }
+
+        .hidden { 
+            display: none !important; 
+        }
+
+        #toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+
+        .toast {
+            background: #1e293b;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            margin-top: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+            border-left: 4px solid var(--primary);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn { 
+            from { 
+                transform: translateX(100%); 
+                opacity: 0; 
+            } 
+            to { 
+                transform: translateX(0); 
+                opacity: 1; 
+            } 
+        }
+
+        @media (max-width: 768px) {
+            .card { 
+                padding: 1.25rem; 
+            }
+            .role-grid { 
+                grid-template-columns: 1fr !important; 
+            }
+            .topbar { 
+                flex-direction: column; 
+                align-items: stretch; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>📖 Library Resource Admin</h1>
+    </header>
+
+    <div id="topbar" class="topbar hidden">
+        <button class="btn btn-secondary" style="margin-right: auto;" onclick="app.fastForward()">⏩ Fast Forward Time</button>
+        <button class="btn btn-secondary" onclick="app.clearData()">Reset System</button>
+        <button class="btn btn-primary" style="background: var(--error)" onclick="app.logout()">Logout</button>
+    </div>
+
+    <main id="app-content">
+        <!-- Dynamic Content -->
+    </main>
+
+    <div id="toast-container"></div>
+
+    <script>
+        const app = {
+            config: {
+                borrowDurationDays: 7,
+                finePerDay: 5
+            },
+            state: {
+                admin: JSON.parse(localStorage.getItem('lib_admin')) || null,
+                users: JSON.parse(localStorage.getItem('lib_users')) || [],
+                books: JSON.parse(localStorage.getItem('lib_books')) || [],
+                currentUser: null,
+                otp: null,
+                otpTargetEmail: null,
+                debugOffsetDays: 0 
+            },
+
+            init() {
+                this.renderRoleSelection();
+            },
+
+            save() {
+                localStorage.setItem('lib_admin', JSON.stringify(this.state.admin));
+                localStorage.setItem('lib_users', JSON.stringify(this.state.users));
+                localStorage.setItem('lib_books', JSON.stringify(this.state.books));
+            },
+
+            render(html) {
+                document.getElementById('app-content').innerHTML = html;
+            },
+
+            showToast(msg, type = 'primary') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.style.borderLeftColor = `var(--${type === 'error' ? 'error' : (type === 'success' ? 'success' : 'primary')})`;
+                toast.innerText = msg;
+                container.appendChild(toast);
+                setTimeout(() => toast.remove(), 4000);
+            },
+
+            getSimulatedNow() {
+                const now = new Date();
+                now.setDate(now.getDate() + this.state.debugOffsetDays);
+                return now;
+            },
+
+            calculateFine(borrowDateStr) {
+                if (!borrowDateStr) return { fine: 0, daysOverdue: 0, dueDate: null };
+                const borrowDate = new Date(borrowDateStr);
+                const dueDate = new Date(borrowDate);
+                dueDate.setDate(dueDate.getDate() + this.config.borrowDurationDays);
+                const now = this.getSimulatedNow();
+                const diffTime = now - dueDate;
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                return { 
+                    fine: diffDays > 0 ? diffDays * this.config.finePerDay : 0, 
+                    daysOverdue: Math.max(0, diffDays), 
+                    dueDate 
+                };
+            },
+
+            renderRoleSelection() {
+                document.getElementById('topbar').classList.add('hidden');
+                this.render(`
+                    <div class="card">
+                        <h2 style="margin-bottom: 2rem; text-align: center">Welcome to the Library</h2>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;" class="role-grid">
+                            <div style="text-align: center; border: 1px solid var(--glass-border); padding: 2rem; border-radius: 1rem;">
+                                <h3>Administrator</h3>
+                                <p style="color: var(--text-dim); margin: 1rem 0;">System & Inventory Control</p>
+                                <button class="btn btn-primary" style="width: 100%" onclick="app.renderLogin('admin')">Admin Login</button>
+                                <button class="btn btn-ghost" style="margin-top: 1rem;" onclick="app.renderRegister('admin')">Register Admin</button>
+                            </div>
+                            <div style="text-align: center; border: 1px solid var(--glass-border); padding: 2rem; border-radius: 1rem;">
+                                <h3>Library Member</h3>
+                                <p style="color: var(--text-dim); margin: 1rem 0;">Browse & Borrow Books</p>
+                                <button class="btn btn-primary" style="width: 100%" onclick="app.renderLogin('user')">Member Login</button>
+                                <button class="btn btn-ghost" style="margin-top: 1rem;" onclick="app.renderRegister('user')">Join Library</button>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            },
+
+            renderRegister(role) {
+                this.render(`
+                    <div class="card" style="max-width: 500px; margin: auto;">
+                        <h2>${role === 'admin' ? 'Admin' : 'Member'} Sign Up</h2>
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" id="reg-user" placeholder="Unique username">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="email" id="reg-email" placeholder="email@example.com">
+                                <button class="btn btn-secondary" onclick="app.handleOTP('reg-email')">Send OTP</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>OTP Code</label>
+                            <input type="text" id="reg-otp" placeholder="4-digit code">
+                        </div>
+                        <div class="form-group">
+                            <label>Create Password</label>
+                            <input type="password" id="reg-pass" placeholder="••••••••">
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm Password</label>
+                            <input type="password" id="reg-confirm" placeholder="••••••••">
+                        </div>
+                        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                            <button class="btn btn-primary" style="flex: 1" onclick="app.handleRegister('${role}')">Register</button>
+                            <button class="btn btn-secondary" onclick="app.renderRoleSelection()">Cancel</button>
+                        </div>
+                    </div>
+                `);
+            },
+
+            renderLogin(role) {
+                this.render(`
+                    <div class="card" style="max-width: 450px; margin: auto;">
+                        <h2>${role === 'admin' ? 'Admin' : 'Member'} Login</h2>
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" id="login-user" placeholder="Your username">
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="login-pass" placeholder="••••••••">
+                        </div>
+                        <div style="text-align: right; margin-top: -0.5rem; margin-bottom: 1.5rem;">
+                            <button class="btn btn-ghost" onclick="app.renderForgotPassword('${role}')">Forgot Password?</button>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%" onclick="app.handleLogin('${role}')">Sign In</button>
+                        <button class="btn btn-ghost" style="width: 100%; margin-top: 1rem;" onclick="app.renderRoleSelection()">Switch Role</button>
+                    </div>
+                `);
+            },
+
+            renderForgotPassword(role) {
+                this.render(`
+                    <div class="card" style="max-width: 450px; margin: auto;">
+                        <h2>Reset Password</h2>
+                        <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 1.5rem;">Verify your email to change your password.</p>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="email" id="reset-email" placeholder="Registered email">
+                                <button class="btn btn-secondary" onclick="app.handleOTP('reset-email')">Get OTP</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>OTP Code</label>
+                            <input type="text" id="reset-otp" placeholder="4-digit code">
+                        </div>
+                        <div class="form-group">
+                            <label>New Password</label>
+                            <input type="password" id="reset-pass" placeholder="New password">
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm New Password</label>
+                            <input type="password" id="reset-confirm" placeholder="Confirm password">
+                        </div>
+                        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                            <button class="btn btn-primary" style="flex: 1" onclick="app.handleResetPassword('${role}')">Update Password</button>
+                            <button class="btn btn-secondary" onclick="app.renderLogin('${role}')">Back</button>
+                        </div>
+                    </div>
+                `);
+            },
+
+            handleOTP(inputId) {
+                const email = document.getElementById(inputId).value;
+                if(!email.includes('@')) return this.showToast("Enter a valid email", "error");
+                
+                this.state.otp = Math.floor(1000 + Math.random() * 9000);
+                this.state.otpTargetEmail = email;
+                this.showToast(`OTP Sent to ${email}`, "primary");
+                this.showToast(`[DEBUG] Code: ${this.state.otp}`, "success");
+            },
+
+            handleRegister(role) {
+                const user = document.getElementById('reg-user').value.trim();
+                const email = document.getElementById('reg-email').value.trim();
+                const otp = document.getElementById('reg-otp').value;
+                const pass = document.getElementById('reg-pass').value;
+                const confirm = document.getElementById('reg-confirm').value;
+
+                if (!user || !email || !pass) return this.showToast("All fields are required", "error");
+                if (otp != this.state.otp || email !== this.state.otpTargetEmail) return this.showToast("OTP Mismatch", "error");
+                if (pass !== confirm) return this.showToast("Passwords do not match", "error");
+
+                const newUser = { user, email, pass };
+                if (role === 'admin') {
+                    this.state.admin = newUser;
+                } else {
+                    if (this.state.users.some(u => u.user === user)) return this.showToast("User already exists", "error");
+                    this.state.users.push(newUser);
+                }
+
+                this.save();
+                this.showToast("Account created!", "success");
+                this.renderLogin(role);
+            },
+
+            handleLogin(role) {
+                const user = document.getElementById('login-user').value;
+                const pass = document.getElementById('login-pass').value;
+
+                if (role === 'admin') {
+                    if (this.state.admin?.user === user && this.state.admin?.pass === pass) {
+                        this.state.currentUser = { ...this.state.admin, role: 'admin' };
+                        this.renderAdminDashboard();
+                    } else this.showToast("Invalid credentials", "error");
+                } else {
+                    const found = this.state.users.find(u => u.user === user && u.pass === pass);
+                    if (found) {
+                        this.state.currentUser = { ...found, role: 'member' };
+                        this.renderUserDashboard();
+                    } else this.showToast("Invalid credentials", "error");
+                }
+            },
+
+            handleResetPassword(role) {
+                const email = document.getElementById('reset-email').value;
+                const otp = document.getElementById('reset-otp').value;
+                const pass = document.getElementById('reset-pass').value;
+                const confirm = document.getElementById('reset-confirm').value;
+
+                if (otp != this.state.otp || email !== this.state.otpTargetEmail) return this.showToast("Invalid OTP", "error");
+                if (pass !== confirm) return this.showToast("Passwords do not match", "error");
+                if (pass.length < 1) return this.showToast("Password cannot be empty", "error");
+
+                if (role === 'admin') {
+                    if (this.state.admin?.email === email) {
+                        this.state.admin.pass = pass;
+                    } else return this.showToast("Email not found for Admin", "error");
+                } else {
+                    const user = this.state.users.find(u => u.email === email);
+                    if (user) {
+                        user.pass = pass;
+                    } else return this.showToast("Email not found", "error");
+                }
+
+                this.save();
+                this.showToast("Password updated!", "success");
+                this.renderLogin(role);
+            },
+
+            renderAdminDashboard() {
+                document.getElementById('topbar').classList.remove('hidden');
+                this.render(`
+                    <div class="card">
+                        <h2>Admin Dashboard</h2>
+                        <section style="margin-top: 1.5rem;">
+                            <h3 style="color: var(--primary); margin-bottom: 1rem;">Add Resource</h3>
+                            <div style="display: grid; grid-template-columns: 2fr 1.5fr 1fr auto; gap: 0.5rem;">
+                                <input type="text" id="book-title" placeholder="Title">
+                                <input type="text" id="book-author" placeholder="Author">
+                                <input type="number" id="book-qty" placeholder="Qty">
+                                <button class="btn btn-primary" onclick="app.addBook()">Add</button>
+                            </div>
+                        </section>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Book</th>
+                                        <th>Author</th>
+                                        <th>Stock</th>
+                                        <th>Borrowers</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${this.state.books.map((b, i) => `
+                                        <tr>
+                                            <td>${b.title}</td>
+                                            <td>${b.author}</td>
+                                            <td>${b.available}/${b.total}</td>
+                                            <td style="font-size: 0.8rem;">${b.borrowers ? b.borrowers.map(l => l.user).join(', ') : '-'}</td>
+                                            <td><button class="btn btn-secondary" onclick="app.deleteBook(${i})">Del</button></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `);
+            },
+
+            renderUserDashboard() {
+                document.getElementById('topbar').classList.remove('hidden');
+                this.render(`
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <h2>Hello, ${this.state.currentUser.user}</h2>
+                            <p style="color: var(--text-dim);">Date: ${this.getSimulatedNow().toLocaleDateString()}</p>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Book Title</th>
+                                        <th>Author</th>
+                                        <th>Status</th>
+                                        <th>Due Date</th>
+                                        <th>Fine</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${this.state.books.map((b, i) => {
+                                        const loan = b.borrowers?.find(l => l.user === this.state.currentUser.user);
+                                        const { fine, daysOverdue, dueDate } = this.calculateFine(loan?.date);
+                                        
+                                        let badge = `<span class="status-badge badge-available">Available</span>`;
+                                        if (loan) badge = `<span class="status-badge badge-borrowed">${daysOverdue > 0 ? 'Overdue' : 'Active'}</span>`;
+                                        else if (b.available === 0) badge = `<span class="status-badge badge-out">Out of Stock</span>`;
+
+                                        return `
+                                        <tr>
+                                            <td style="font-weight: 600;">${b.title}</td>
+                                            <td>${b.author}</td>
+                                            <td>${badge}</td>
+                                            <td>${dueDate ? dueDate.toLocaleDateString() : '-'}</td>
+                                            <td style="color: ${fine > 0 ? 'var(--error)' : 'inherit'}">₹${fine}</td>
+                                            <td>
+                                                ${loan 
+                                                    ? `<button class="btn btn-secondary" onclick="app.returnBook(${i})">Return</button>`
+                                                    : `<button class="btn btn-primary" ${b.available === 0 ? 'disabled' : ''} onclick="app.borrowBook(${i})">Borrow</button>`
+                                                }
+                                            </td>
+                                        </tr>`;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `);
+            },
+
+            addBook() {
+                const title = document.getElementById('book-title').value;
+                const author = document.getElementById('book-author').value;
+                const qty = parseInt(document.getElementById('book-qty').value);
+                if (!title || !author || isNaN(qty)) return this.showToast("Invalid Input", "error");
+                this.state.books.push({ title, author, total: qty, available: qty, borrowers: [] });
+                this.save();
+                this.renderAdminDashboard();
+            },
+
+            borrowBook(idx) {
+                const book = this.state.books[idx];
+                if (book.available > 0) {
+                    book.available--;
+                    if (!book.borrowers) book.borrowers = [];
+                    book.borrowers.push({ user: this.state.currentUser.user, date: this.getSimulatedNow().toISOString() });
+                    this.save();
+                    this.renderUserDashboard();
+                    this.showToast("Book Borrowed!", "success");
+                }
+            },
+
+            returnBook(idx) {
+                const book = this.state.books[idx];
+                const loanIdx = book.borrowers.findIndex(l => l.user === this.state.currentUser.user);
+                if (loanIdx > -1) {
+                    book.available++;
+                    book.borrowers.splice(loanIdx, 1);
+                    this.save();
+                    this.renderUserDashboard();
+                    this.showToast("Book Returned!", "success");
+                }
+            },
+
+            deleteBook(i) {
+                this.state.books.splice(i, 1);
+                this.save();
+                this.renderAdminDashboard();
+            },
+
+            fastForward() {
+                this.state.debugOffsetDays += 1;
+                this.showToast(`Time advanced by 1 day.`, "primary");
+                if (this.state.currentUser?.role === 'admin') this.renderAdminDashboard();
+                else if (this.state.currentUser) this.renderUserDashboard();
+            },
+
+            logout() {
+                this.state.currentUser = null;
+                this.state.debugOffsetDays = 0;
+                this.renderRoleSelection();
+            },
+
+            clearData() {
+                if (confirm("Reset everything?")) { localStorage.clear(); location.reload(); }
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => app.init());
+    </script>
+</body>
+</html>
